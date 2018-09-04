@@ -115,15 +115,20 @@ class PerplexityWorld(World):
         num_tokens = 0
         num_unk = 0
         self.agent.observe(action)
+        #print("Input : ", action['text'])
+        #print("Expected Output : ", parsed)
         for i in range(len(parsed)):
             if parsed[i] in self.dict:
                 # only score words which are in the dictionary
+                #print("Trying to predict: ", parsed[i])
                 probs = self.agent.next_word_probability(parsed[:i])
                 # get probability of correct answer, divide by total prob mass
                 prob_true = probs.get(parsed[i], 0)
                 if prob_true > 0:
                     prob_true /= sum((probs.get(k, 0) for k in self.dict.keys()))
                     loss -= math.log(prob_true)
+                    #print("This word prob: ", prob_true)
+                    #print("This word loss: ", math.log(prob_true))
                 else:
                     loss = float('inf')
                 num_tokens += 1

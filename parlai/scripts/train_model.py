@@ -223,8 +223,14 @@ class TrainLoop():
             subtask = opt['validation_metric'].split('/')[0]
             validation_metric = opt['validation_metric'].split('/')[1]
             new_valid = valid_report['tasks'][subtask][validation_metric]
+            if opt['validation_metric'] == 'ppl':
+                new_valid = -new_valid
         else:
             new_valid = valid_report[opt['validation_metric']]
+            if opt['validation_metric'] == 'ppl':
+                new_valid = -new_valid
+
+
 
         # check if this is the best validation so far
         if self.best_valid is None or self.valid_optim * new_valid > self.valid_optim * self.best_valid:
