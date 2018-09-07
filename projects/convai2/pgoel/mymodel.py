@@ -1,11 +1,16 @@
+import torch
 import torch.nn as nn
+import bcolz
+import pickle
+import numpy as np
 
 class MyRNNModel(nn.Module):
     """Container module with an encoder, a recurrent module, and a decoder."""
 
-    def __init__(self, opt, ntoken, dropout=0.5, tie_weights=False):
+    def __init__(self, opt, ntoken, vocab, dropout=0.5, tie_weights=False):
         rnn_type = opt['rnn_class']
-        ninp = opt['embeddingsize']
+        #ninp = opt['embeddingsize']
+        ninp = 50
         nhid = opt['hiddensize']
         nlayers = opt['numlayers']
         super(MyRNNModel, self).__init__()
@@ -33,15 +38,30 @@ class MyRNNModel(nn.Module):
                 raise ValueError('When using the tied flag, nhid must be equal to emsize')
             self.decoder.weight = self.encoder.weight
 
-        self.init_weights()
+        self.init_weights(ntoken, vocab)
 
         self.rnn_type = rnn_type
         self.nhid = nhid
         self.nlayers = nlayers
 
-    def init_weights(self):
+    def init_weights(self, ntoken, vocab):
+        vectors = bcolz.open(f'./glove.6B/6B.50.dat')[:]
+        words = pickle.load(open(f'./glove.6B/6B.50_words.pkl', 'rb'))
+        word2idx = pickle.load(open(f'./glove.6B/6B.50_idx.pkl', 'rb'))
+
+        glove = {w: vectors[word2idx[w]] for w in words}
+        weights_matrix = np.zeros((ntoken, 50))
+        words_found = 0
+        for i, word in enumerate(vocab):
+            try:
+                weights_matrix[i] = glove[word]
+                words_found += 1
+            except KeyError:
+                weights_matrix[i] = np.random.normal(scale=0.6, size=(50,))
+        print("# of words with GloVe embeddings : ", words_found)
         initrange = 0.1
-        self.encoder.weight.data.uniform_(-initrange, initrange)
+        #self.encoder.weight.data.uniform_(-initrange, initrange)
+        self.encoder.weight.data.copy_(torch.from_numpy(weights_matrix))
         self.decoder.bias.data.zero_()
         self.decoder.weight.data.uniform_(-initrange, initrange)
 

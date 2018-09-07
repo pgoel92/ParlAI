@@ -115,8 +115,8 @@ if __name__ == '__main__':
     parser.add_argument('-vme', '--validation-max-exs', type=int, default=-1)
     parser.set_params(
         model='projects.convai2.pgoel.eval_ppl:LanguageModelEntry',
-        model_file='/Users/pgoel/Git/ParlAI/projects/convai2/pgoel/models/mylanguagemodel',
-        dict_file='/Users/pgoel/Git/ParlAI/projects/convai2/pgoel/models/mylanguagemodel.dict',
+        model_file='/Users/pgoel/Git/ParlAI/projects/convai2/pgoel/mylanguagemodel',
+        dict_file='/Users/pgoel/Git/ParlAI/projects/convai2/pgoel/mylanguagemodel.dict',
         batchsize=1,
     )
     opt = parser.parse_args()

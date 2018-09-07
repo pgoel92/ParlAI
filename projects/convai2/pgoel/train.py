@@ -14,7 +14,7 @@ from parlai.scripts.train_model import setup_args, TrainLoop
 if __name__ == '__main__':
     parser = setup_args()
     parser.set_defaults(
-        task='cornell_movie',
+        task='convai2:self',
         model='projects.convai2.pgoel.language_model:MyLanguageModelAgent',
         model_file='/tmp/mylanguagemodel',
         dict_lower=True,

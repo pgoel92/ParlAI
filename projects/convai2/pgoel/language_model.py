@@ -170,7 +170,7 @@ class MyLanguageModelAgent(Agent):
                 self.dict.add_to_dict(self.dict.tokenize("PERSON2"))
 
             # set model
-            self.model = MyRNNModel(opt, len(self.dict))
+            self.model = MyRNNModel(opt, len(self.dict), self.dict.tok2ind)
 
             if init_model is not None:
                 self.load(init_model)
