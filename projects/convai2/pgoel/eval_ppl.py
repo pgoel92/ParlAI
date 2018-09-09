@@ -115,9 +115,10 @@ if __name__ == '__main__':
     parser.add_argument('-vme', '--validation-max-exs', type=int, default=-1)
     parser.set_params(
         model='projects.convai2.pgoel.eval_ppl:LanguageModelEntry',
-        model_file='/Users/pgoel/Git/ParlAI/projects/convai2/pgoel/mylanguagemodel',
-        dict_file='/Users/pgoel/Git/ParlAI/projects/convai2/pgoel/mylanguagemodel.dict',
+        model_file='/Users/pgoel/Git/ParlAI/projects/convai2/pgoel/models/convai2lm_glove',
+        dict_file='/Users/pgoel/Git/ParlAI/projects/convai2/pgoel/models/convai2lm_glove.dict',
         batchsize=1,
+        dict_tokenizer='nltk',
     )
     opt = parser.parse_args()
     #opt['model_type'] = 'language_model'

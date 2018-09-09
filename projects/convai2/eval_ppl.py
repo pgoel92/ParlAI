@@ -95,7 +95,7 @@ class WordFrequencyEntry(Agent):
 
 
 def eval_ppl(opt):
-    return run_eval_ppl(opt, build_dict)
+    return run_eval_ppl(opt, dict_file=opt['dict_file'])
 
 
 if __name__ == '__main__':

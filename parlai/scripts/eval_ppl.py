@@ -133,7 +133,9 @@ class PerplexityWorld(World):
                     loss = float('inf')
                 num_tokens += 1
             else:
+                print("Word not in dict : " + parsed[i])
                 num_unk += 1
+        #print("Total loss per token: ", loss / num_tokens)
         with self._lock():
             self.metrics['exs'] += 1
             self.metrics['loss'] += loss
