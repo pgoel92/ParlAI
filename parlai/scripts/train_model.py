@@ -107,6 +107,12 @@ def run_eval(agent, opt, datatype, max_exs=-1, write_log=False, valid_world=None
     - valid_world can be an existing world which will be reset instead of reinitialized
     """
     print('[ running eval: ' + datatype + ' ]')
+    print(agent)
+    print(opt)
+    print(max_exs)
+    print(valid_world)
+    print("*************")
+    #import ipdb; ipdb.set_trace()
     if 'stream' in opt['datatype']:
         datatype += ':stream'
 
@@ -124,8 +130,8 @@ def run_eval(agent, opt, datatype, max_exs=-1, write_log=False, valid_world=None
     cnt = 0
     while not valid_world.epoch_done():
         valid_world.parley()
-        if cnt == 0 and opt['display_examples']:
-            print(valid_world.display() + '\n~~')
+        if cnt % 3 == 0 and opt['display_examples']:
+            #print(valid_world.display() + '\n~~')
             print(valid_world.report())
         cnt += opt['batchsize']
         if max_exs > 0 and cnt > max_exs + opt.get('numthreads', 1):
@@ -154,6 +160,11 @@ def save_best_valid(model_file, best_valid):
 
 class TrainLoop():
     def __init__(self, opt):
+
+
+
+
+
         if isinstance(opt, ParlaiParser):
             print('[ Deprecated Warning: TrainLoop should be passed opt not Parser ]')
             opt = opt.parse_args()

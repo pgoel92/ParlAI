@@ -17,6 +17,7 @@ from torch.autograd import Variable
 from language_model import MyLanguageModelAgent
 import torch.nn.functional as F
 import math
+from parlai.scripts.train_model import TrainLoop
 
 
 class LanguageModelEntry(MyLanguageModelAgent):
@@ -114,15 +115,43 @@ if __name__ == '__main__':
     parser = setup_args()
     parser.add_argument('-vme', '--validation-max-exs', type=int, default=-1)
     parser.set_params(
-        model='projects.convai2.pgoel.eval_ppl:LanguageModelEntry',
+        #model='projects.convai2.pgoel.eval_ppl:LanguageModelEntry',
+        model='projects.convai2.pgoel.language_model:MyLanguageModelAgent',
         model_file='/Users/pgoel/Git/ParlAI/projects/convai2/pgoel/models/convai2lm_glove',
         dict_file='/Users/pgoel/Git/ParlAI/projects/convai2/pgoel/models/convai2lm_glove.dict',
         batchsize=1,
         dict_tokenizer='nltk',
+        dict_lower=True,
+        dict_include_valid=True,
+        dict_maxexs=-1,
+        numlayers=1,
+        hiddensize=1024,
+        dropout=0.2,
+        attention='general',
+        personachat_attnsentlevel=True,
+        personachat_sharelt=True,
+        personachat_learnreweight=True,
+        personachat_reweight='use',
+        truncate=100,
+        rank_candidates=True,
+        log_every_n_secs=10,
+        load_from_checkpoint=False,
+        dict_build_first=True,
+        num_epochs=50,
+        max_train_time=1000,
+        validation_every_n_secs=10,
+        validation_metric='ppl',
+        validation_metric_mode='max',
+        validation_patience=10,
+        save_every_n_secs=180,
+        validation_every_n_epochs=10,
+        tensorboard_log=False,
+        display_examples=True
     )
     opt = parser.parse_args()
     #opt['model_type'] = 'language_model'
     #fnames = ['model', 'model.dict', 'model.opt']
     #download_models(opt, fnames, 'convai2', version='v2.0',
     #                use_model_type=True)
-    eval_ppl(opt)
+    #eval_ppl(opt)
+    TrainLoop(opt).validate()

@@ -110,32 +110,39 @@ class PerplexityWorld(World):
             # empty example, move on
             return
 
+        #print("Dictionary file being used : ", self.dict.opt['dict_file'])
+        #print("Dictionary tokenizer : ", self.dict.opt['dict_tokenizer'])
+        self.dict.update_tokenizer('nltk')
         parsed = self.dict.tokenize(labels[0])
         loss = 0
         num_tokens = 0
         num_unk = 0
         self.agent.observe(action)
-        #print("Input : ", action['text'])
-        #print("Expected Output : ", parsed)
+        sysout = ""
+        sysout += "Input : " + action['text'] + "\n"
+        sysout += "Expected Output : " + ' '.join(parsed) + "\n"
         for i in range(len(parsed)):
             if parsed[i] in self.dict:
                 # only score words which are in the dictionary
-                #print("Trying to predict: ", parsed[i])
+                sysout +=  "Trying to predict: " + parsed[i] + "\n"
                 probs = self.agent.next_word_probability(parsed[:i])
                 # get probability of correct answer, divide by total prob mass
                 prob_true = probs.get(parsed[i], 0)
                 if prob_true > 0:
                     prob_true /= sum((probs.get(k, 0) for k in self.dict.keys()))
                     loss -= math.log(prob_true)
-                    #print("This word prob: ", prob_true)
-                    #print("This word loss: ", math.log(prob_true))
+                    sysout += "This word prob: " + str(prob_true) + "\n"
+                    sysout += "This word loss: " + str(math.log(prob_true)) + "\n"
                 else:
                     loss = float('inf')
                 num_tokens += 1
             else:
-                print("Word not in dict : " + parsed[i])
+                sysout += "Word not in dict : " + parsed[i] + "\n"
                 num_unk += 1
-        #print("Total loss per token: ", loss / num_tokens)
+        sysout += "Total loss per token: " + str(loss / num_tokens) + "\n"
+        print("This example loss : " + str(loss / num_tokens))
+        #if loss / num_tokens > 5:
+        #    print(sysout)
         with self._lock():
             self.metrics['exs'] += 1
             self.metrics['loss'] += loss
@@ -193,18 +200,22 @@ def eval_ppl(opt, build_dict=None, dict_file=None):
     Either build_dict or dict_file must be set (both default to None) to
     determine the dictionary used for the evaluation.
     """
+    print("OPT ", opt)
     if not build_dict and not dict_file:
         raise RuntimeError('eval_ppl script either needs a dictionary build '
                            'function or a dictionary file.')
 
     if build_dict:
+        print("building dict")
         dict_agent = build_dict()
     else:
+        print("loading existing dict")
         dict_opt = copy.deepcopy(opt)
         dict_opt['model'] = dict_opt.get('dictionary_class', 'parlai.core.dict:DictionaryAgent')
         dict_opt['model_file'] = dict_file
         if 'override' in dict_opt:
             del dict_opt['override']
+        print("Dict opt tokenizer: ", dict_opt['dict_tokenizer'])
         dict_agent = create_agent(dict_opt, requireModelExists=True)
 
     # create agents
@@ -215,6 +226,7 @@ def eval_ppl(opt, build_dict=None, dict_file=None):
     log_time = Timer()
     tot_time = 0
 
+    print("Starting parley")
     while not world.epoch_done():
         world.parley()  # process an example
 

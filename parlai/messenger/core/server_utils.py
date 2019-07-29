@@ -112,10 +112,15 @@ def setup_heroku_server(task_name):
                 'program again.'.format(heroku_executable_path)
             )
 
+    #heroku_app_name = ('{}-{}-{}'.format(
+    #    user_name,
+    #    task_name,
+    #    hashlib.md5(heroku_user_identifier.encode('utf-8')).hexdigest()
+    #))[:30]
     heroku_app_name = ('{}-{}-{}'.format(
         user_name,
         task_name,
-        hashlib.md5(heroku_user_identifier.encode('utf-8')).hexdigest()
+        '1'
     ))[:30]
 
     while heroku_app_name[-1] == '-':

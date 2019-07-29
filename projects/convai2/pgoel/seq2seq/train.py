@@ -15,8 +15,8 @@ if __name__ == '__main__':
     parser = setup_args()
     parser.set_defaults(
         task='convai2:self',
-        model='projects.convai2.pgoel.language_model:MyLanguageModelAgent',
-        model_file='/tmp/mylanguagemodel',
+        model='parlai.agents.seq2seq.seq2seq:Seq2seqAgent',
+        model_file='/tmp/myseq2seqmodel',
         dict_lower=True,
         dict_include_valid=True,
         dict_maxexs=-1,
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         personachat_reweight='use',
         truncate=100,
         rank_candidates=True,
-        validation_every_n_secs=180,
+        validation_every_n_secs=100,
         validation_metric='ppl',
         validation_metric_mode='max',
         validation_patience=10,

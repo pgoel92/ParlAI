@@ -261,6 +261,7 @@ class MyLanguageModelAgent(Agent):
         self.metrics['lm_num_tokens'] = 0
 
     def report(self):
+        print("Inside agent report function")
         m = {}
         if self.metrics['num_tokens'] > 0:
             m['loss'] = self.metrics['loss'] / self.metrics['num_tokens']
@@ -337,6 +338,8 @@ class MyLanguageModelAgent(Agent):
             if 'text' in obs:
                 if self.use_person_tokens:
                     obs['text'] = 'PERSON1 ' + obs['text']
+                print("*****************")
+                print(obs['text'])
             if 'eval_labels' in obs:
                 if self.use_person_tokens:
                     eval_labels = ['PERSON2 ' + label for label in obs['eval_labels'] if label != '']
@@ -385,7 +388,6 @@ class MyLanguageModelAgent(Agent):
         """Generates predictions word by word until we either reach the end token
            or some max length (opt['truncate_pred']).
         """
-        print("inside get_predictions")
         token_list = []
         bsz = data.size(0)
         done = [False for _ in range(bsz)]
@@ -444,6 +446,7 @@ class MyLanguageModelAgent(Agent):
         output = None
         predictions = None
         if is_training:
+            print("TRAINING ***********")
             self.model.train()
             self.zero_grad()
             output, hidden = self.model(data, hidden)
@@ -465,6 +468,8 @@ class MyLanguageModelAgent(Agent):
                 self.hidden = self.model.init_hidden(bsz)
             if targets is not None:
                 loss = self.get_target_loss(data, self.hidden, targets)
+                print("This example loss : ", loss / sum(y_lens))
+                print("*****************")
                 self.metrics['loss'] += loss
                 self.metrics['num_tokens'] += sum(y_lens)
 
@@ -552,6 +557,11 @@ class MyLanguageModelAgent(Agent):
             temp_dicts = [{'id': self.getID()} for _ in range(len(observations))]
             # ignore case when we do not return any valid indices
             if data_list[i] is not None:
+                #print(data_list[i])
+                #print(data_list[i].size())
+                #print(data_list[i].t()[0])
+                #print(self.dict.vec2txt(data_list[i].t()[0]))
+                #print(self.dict.vec2txt(targets_list[i].t()[0]))
                 output, hidden, predictions = self.predict(data_list[i], self.hidden, targets_list[i], self.is_training,
                                                            y_lens)
                 self.hidden = self.repackage_hidden(hidden)

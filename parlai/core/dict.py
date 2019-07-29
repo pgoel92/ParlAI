@@ -275,6 +275,26 @@ class DictionaryAgent(Agent):
             if opt.get('dict_file'):
                 self.save_path = opt['dict_file']
 
+    def update_tokenizer(self, tokenizer):
+        try:
+            self.tokenizer_fun = getattr(self, tokenizer + '_tokenize')
+        except AttributeError:
+            raise AttributeError(
+                'tokenizer type {} not yet supported'.format(tokenizer))
+        if tokenizer == 'nltk':
+            try:
+                import nltk
+            except ImportError:
+                raise ImportError('Please install nltk (e.g. pip install nltk).')
+            # nltk-specific setup
+            st_path = 'tokenizers/punkt/{0}.pickle'.format(self.opt['dict_language'])
+            try:
+                self.sent_tok = nltk.data.load(st_path)
+            except LookupError:
+                nltk.download('punkt')
+                self.sent_tok = nltk.data.load(st_path)
+            self.word_tok = nltk.tokenize.treebank.TreebankWordTokenizer()
+
     def add_token(self, word):
         if word not in self.tok2ind:
             index = len(self.tok2ind)
@@ -354,9 +374,8 @@ class DictionaryAgent(Agent):
         """Uses nltk-trained PunktTokenizer for sentence tokenization and
         Treebank Word Tokenizer for tokenizing words within sentences.
         """
-
-        return (token for sent in self.sent_tok.tokenize(text)
-                for token in self.word_tok.tokenize(sent))
+        return ([token for sent in self.sent_tok.tokenize(text)
+                for token in self.word_tok.tokenize(sent)])
 
     @staticmethod
     def re_tokenize(text):
